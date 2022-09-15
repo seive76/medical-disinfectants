@@ -3,7 +3,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 
 # 소독제 품목기준코드 기준으로 추출
-disinfectants = pd.read_csv("disin_basic/disinfectants.csv")['품목명']
+disinfectants = pd.read_csv("../disin_basic/disinfectants.csv")['품목명']
 
 #항목 parsing 함수작성하기
 def parse():
