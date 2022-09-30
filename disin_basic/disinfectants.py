@@ -89,6 +89,8 @@ def disin_parsing():
             row.append(parse())
 
     df=pd.DataFrame(row)
-    df=df[df['분류명']=='[07390]기타의 공중위생용약']
-    df.to_csv("disinfectants.csv", mode="w")
+    df1=df[df['분류명']=='[07390]기타의 공중위생용약']
+    df2=df[df['분류명']=='[07390]기타의 공중위생용약']
+    df3=pd.concat([df1, df2])
+    df3.to_csv("disinfectants.csv", mode="w")
 
