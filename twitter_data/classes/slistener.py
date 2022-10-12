@@ -1,9 +1,9 @@
-from tweepy import Stream
+from tweepy
 import json
 import time
 import sys
 
-class SListener(Stream):
+class SListener(tweepy.Stream):
     def __init__(self, api = None, fprefix = 'streamer'):
         self.api = api or API()
         self.counter = 0
@@ -55,4 +55,19 @@ class SListener(Stream):
     def on_timeout(self):
         print("Timeout, sleeping for 60 seconds...")
         time.sleep(60)
-        return 
+        return
+    
+
+class MyListener(tweepy.Stream):
+    def on_data(self, data):
+        try:
+            with open('python.json', 'a') as f:
+                f.write(data)
+                return True
+        except BaseException as e:
+            print("Error on_data: %s" % str(e))
+        return True
+ 
+    def on_error(self, status):
+        print(status)
+        return True
