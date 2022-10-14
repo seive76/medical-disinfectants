@@ -1,3 +1,6 @@
+import tweepy
+import config
+
 def flatten_tweets(tweets_json):
     """ Flattens out tweet dictionaries so relevant JSON
         is in a top-level dictionary."""
@@ -24,3 +27,18 @@ def flatten_tweets(tweets_json):
             
         tweets_list.append(tweet_obj)
     return tweets_list
+
+def parse_disinfectants_tweets():
+    """ '소독제'언급 트윗 추출(retweets 제외), 
+       텍스트파일, 'disinfectants_tweets.txt', 저장하기"""
+    
+    client = tweepy.Client(bearer_token=config.BEARER_TOKEN)
+    query = '소독제 -is:retweet'
+    
+    # what if want to store them in txt
+    file_name = 'disinfectants_tweets_text.txt'
+
+    with open(file_name, 'a+') as filehandler:
+        for tweet in tweepy.Paginator(client.search_recent_tweets, query = query, max_results=100).flatten(limit=1000):
+            filehandler.write('%s\n' % tweet.text)
+    
