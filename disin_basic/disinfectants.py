@@ -75,7 +75,7 @@ service_key = 'i4kidk21c3X/hLkySwIiPJ8aTr1xRqQ/CWnluHr1zG2jx1LUBZrsfheuojj5ZlO79
 # 공공데이터 의약품 기본정보 파싱 함수
 def disin_parsing():
     row = []
-    for n in range(521):
+    for n in range(600):
         params = {'serviceKey' : service_key, 
                   'pageNo' : n+1, 
                   'numOfRows' : '100'
