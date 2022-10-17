@@ -1,9 +1,11 @@
-import config
+#import tweepy
 
 def parse_dis_tweets():
     # what if want to store them in txt
     
-    client = tweepy.Client(bearer_token=config.BEARER_TOKEN)
+    import tweepy
+    import tweet_api
+    client = tweepy.Client(bearer_token=tweet_api.BEARER_TOKEN)
 
     query = '소독제 -is:retweet'
     
