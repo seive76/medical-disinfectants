@@ -1,6 +1,7 @@
 #for jupyter notebook
 */.ipynb_checkpoints/
 .ipynb.checkpoints/
+*.ipynb
 
 # folders 
-/notebook
+/notebook/
