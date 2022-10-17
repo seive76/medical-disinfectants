@@ -15,6 +15,9 @@ limit = 300
 columns = ['Time', 'User', 'Tweet']
 data = []
 
+# Import the present 
+df_1 = pd.read_csv('dat/ingredients_mentioned.csv', usecols=['Time', 'User', 'Tweet'])
+
 for keyword in keywords:
     tweets = tweepy.Cursor(api.search_tweets, 
                        q=keyword,
@@ -24,8 +27,12 @@ for keyword in keywords:
     for tweet in tweets:
         data.append([tweet.created_at, tweet.user.screen_name, tweet.full_text])
 
-    df=pd.DataFrame(data, columns=columns)
+    df_2 = pd.DataFrame(data, columns=columns)
 # print(df.shape)
 # df.head()
 
+    # Merge new to the previous one
+    df = pd.concat([df_1, df_2]) 
+    df = df[['Time', 'User', 'Tweet']] # select columns necessary
+    df.drop_duplicates(inplace=True) # drop the duplicated columns
     df.to_csv('dat/ingredients_mentioned.csv')
