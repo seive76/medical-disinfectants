@@ -4,4 +4,5 @@
 *.ipynb
 
 # folders 
-/notebook/
+nootbook/
+python_test/
