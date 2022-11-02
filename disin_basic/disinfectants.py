@@ -73,24 +73,24 @@ service_key = 'i4kidk21c3X/hLkySwIiPJ8aTr1xRqQ/CWnluHr1zG2jx1LUBZrsfheuojj5ZlO79
 
 
 # 공공데이터 의약품 기본정보 파싱 함수
-def disin_parsing():
-    row = []
-    for n in range(600):
-        params = {'serviceKey' : service_key, 
-                  'pageNo' : n+1, 
-                  'numOfRows' : '100'
-                 }
-    
-        r = requests.get(url, params)
-        soup = BeautifulSoup(r.text, 'lxml-xml')
-        items = soup.find_all("item")
-    
-        for item in items:
-            row.append(parse())
+# def disin_parsing():
+row = []
+for n in range(600):
+    params = {'serviceKey' : service_key, 
+                'pageNo' : n+1, 
+                'numOfRows' : '100'
+                }
 
-    df=pd.DataFrame(row)
-    df1=df[df['분류명']=='[07390]기타의 공중위생용약']
-    df2=df[df['분류명']=='[07390]기타의 공중위생용약']
-    df3=pd.concat([df1, df2])
-    df3.to_csv("disinfectants.csv", mode="w")
+    r = requests.get(url, params)
+    soup = BeautifulSoup(r.text, 'lxml-xml')
+    items = soup.find_all("item")
+
+    for item in items:
+        row.append(parse())
+
+df=pd.DataFrame(row)
+df1=df[df['분류명']=='[07390]기타의 공중위생용약']
+df2=df[df['분류명']=='[07320]방역용 살균소독제']
+df3=pd.concat([df1, df2])
+df3.to_csv("disinfectants.csv", mode="w")
 
