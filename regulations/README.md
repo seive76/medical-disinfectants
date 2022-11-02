@@ -13,3 +13,6 @@ Spreadsheet part
 
 Python Part
 1) Create a python file that stores codes shown in the file
+
+Package Info
+gspread, https://docs.gspread.org/en/latest/user-guide.html#selecting-a-worksheet
