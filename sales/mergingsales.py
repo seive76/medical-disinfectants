@@ -7,7 +7,7 @@ def merge():
     df3 = pd.read_csv("medicalSales2019.csv")
     df4 = pd.read_csv("medicalSales2020.csv")
     df5 = pd.read_csv("medicalSales2021.csv")
-    
+
     # Add a new column, year
     df1['year'] = 2017
     df2['year'] = 2018
@@ -47,7 +47,7 @@ def merge():
 
     # Clean the sales records and convert to integer
     sales['sales'] = sales.sales.apply(to_clean)
-    sales['sales'] = sales.sales.astype(int)
+    # sales['sales'] = sales.sales.astype(int)
 
     # Get rid of empty values
     sales = sales[sales['sales']!='']
@@ -56,4 +56,20 @@ def merge():
     sales['year']= pd.to_datetime(sales['year'], format='%Y')
 
     # Export the sales records
-    sales.to_csv("mergedSales.csv", mode="w")
+    # sales.to_csv("mergedSales.csv", mode="w")
+
+    sales.loc[(sales['품목명']=='페라세이프'), '품목명']="페라세이프(과붕산나트륨)"
+    sales.loc[(sales['품목명']=='노코리즈액'), '품목명']='노코리즈액(과산화수소수30%)'
+    sales.loc[(sales['품목명']=='싸이덱스오피에이액'), '품목명']='싸이덱스오피에이액(오토프탈알데하이드)'
+    sales.loc[(sales['품목명']=='스테리스-20액'), '품목명']='스테리스-20액(35%과초산)'
+    sales.loc[(sales['품목명']=='스테리스-40액'), '품목명']='스테리스-40액(35.5%과아세트산)'
+    sales.loc[(sales['품목명']=='아세사이드액'), '품목명']='아세사이드액(저농도과초산평형혼합물)'
+    sales.loc[(sales['품목명']=='페라스텔액'), '품목명']='페라스텔액(과초산4%)'
+    sales.loc[(sales['품목명']=='에이치엠씨엔에프산'), '품목명']='에이치엠씨엔에프산(과탄산나트륨)'
+    sales.loc[(sales['품목명']=='트리스텔스포리와입스앤폼'), '품목명']='트리스텔 스포리와입스앤폼'
+    sales.loc[(sales['품목명']=='조양피에이에이15액'), '품목명']='조양피에이에이15액(과아세트산액)'
+
+    # Export the cleaned sales records for the disinfectant segment
+    sales.to_csv("mergingSales.csv", mode="w")
+
+merge()
