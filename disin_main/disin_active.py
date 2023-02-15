@@ -41,7 +41,7 @@ def parse():
 
 # 의약품 소독제 주성분 추출
 service_key = 'i4kidk21c3X/hLkySwIiPJ8aTr1xRqQ/CWnluHr1zG2jx1LUBZrsfheuojj5ZlO79XhfL0gAEfmrz3TqpVWidg=='
-url = 'http://apis.data.go.kr/1471000/DrugPrdtPrmsnInfoService02/getDrugPrdtMcpnDtlInq?'
+url = 'http://apis.data.go.kr/1471000/DrugPrdtPrmsnInfoService03/getDrugPrdtMcpnDtlInq02?'
 
 active = []
 
