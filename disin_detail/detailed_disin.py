@@ -49,8 +49,8 @@ def parse():
 
         return {
             "품목기준코드":ITEM_SEQ,
-            "품목명":ITEM_NAME,
-            "제품명":ENTP_NAME,
+            "제품명":ITEM_NAME,
+            "기업명":ENTP_NAME,
             "품목허가일자":ITEM_PERMIT_DATE,
             "위탁제조업체":CNSGN_MANUF,
             "전문일반":ETC_OTC_CODE,
