@@ -22,7 +22,7 @@ for key in keys:
     
     # 추출 objects 중 생산 소독제만 필터
     for link in soup.find_all('th'):
-        if '생산실적' in link.text:
+        if '실적' in link.text:
             table = soup.find('table', class_= 's-dr_table dr_table_type2')
             
             # 관련 테이블접속, 데이터 추출
