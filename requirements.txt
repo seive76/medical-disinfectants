@@ -1,2 +1,6 @@
 numpy==1.22.3
 pandas
+python-dotenv
+ratelimit
+tqdm>=4.65.0
+lxml>=4.9.0

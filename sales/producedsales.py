@@ -1,60 +1,113 @@
+import logging
 from urllib.request import urlopen 
 from bs4 import BeautifulSoup
 import pandas as pd
-
-# 소독제 등록 제품 가져오기
-df = pd.read_csv("../disin_basic/disinfectants.csv")
-
-# 소독제 품목기준코드 리스트 생성
-keys = df['품목기준코드']
-
-# 웹추출 빈 데이터프레임 생성
-df = pd.DataFrame(columns = ['code', 'year', 'sales'])
-
-# 웹사이트 url 주소
-path = "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq="
-
-# 웹사이트 데이터 추출 - 소독제 제품별 랜딩페이지 접속 & Soup변환
-for key in keys:
-    web = path + str(key)
-    web = urlopen(web)
-    soup = BeautifulSoup(web, "html.parser")
-    
-    # 추출 objects 중 생산 소독제만 필터
-    for link in soup.find_all('th'):
-        if '실적' in link.text:
-            table = soup.find('table', class_= 's-dr_table dr_table_type2')
-            
-            # 관련 테이블접속, 데이터 추출
-            for row in table.tbody.find_all('tr'):
-                # find all data for each column
-                columns = row.find_all('td')
-
-                if(columns != []):
-                    year = columns[0].text.strip()
-                    sales = columns[1].text.strip()
-
-                    # sales 데이터프레임에 기입하기
-                    df = df.append({'code': key ,'year': year, 'sales': sales}, ignore_index=True)
-
 import re
+from typing import List, Dict
+import time
 
-# 세일즈 데이터 변환하기
-df['sales'] = [re.sub(r'[^0-9]', "", sale) for sale in df.sales]
-df['sales'] = [int(sale) for sale in df.sales]
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
-# 연도 문자데이터 datetime 변환 & 연도변도
-df['year'] = [re.sub(r'[^0-9]', "", yr) for yr in df.year]
-df.year = [pd.to_datetime(int(yr),format='%Y') for yr in df.year]
-df.year = pd.DatetimeIndex(df['year']).year
+# Configuration
+CONFIG = {
+    'INPUT_FILE': '../disin_basic/disinfectants.csv',
+    'OUTPUT_FILE': 'producedSales.csv',
+    'BASE_URL': "https://nedrug.mfds.go.kr/pbp/CCBBB01/getItemDetail?itemSeq=",
+    'REQUEST_DELAY': 1,  # seconds between requests
+    'DIS_COLS': ['품목명', '업체명', '품목허가일자', '분류명', '주성분', '품목기준코드']
+}
 
-# 생산실적 데이터 추가 제품정보 업데이트 데이트셋 추출
-disin = pd.read_csv('../disin_basic/disinfectants.csv')
-dis_cols = ['품목명', '업체명', '품목허가일자', '분류명', '주성분', '품목기준코드']
-disin = disin[dis_cols]
+def load_disinfectant_data() -> pd.DataFrame:
+    """Load the disinfectant product data from CSV."""
+    try:
+        return pd.read_csv(CONFIG['INPUT_FILE'])
+    except FileNotFoundError:
+        logger.error(f"Input file not found: {CONFIG['INPUT_FILE']}")
+        raise
 
-# 병합
-df = pd.merge(df, disin, how = 'left', left_on='code', right_on='품목기준코드')
+def scrape_sales_data(product_codes: List[str]) -> pd.DataFrame:
+    """Scrape sales data for each product code."""
+    sales_data = []
+    
+    for code in product_codes:
+        try:
+            url = CONFIG['BASE_URL'] + str(code)
+            logger.info(f"Scraping data for product code: {code}")
+            
+            with urlopen(url) as response:
+                soup = BeautifulSoup(response, "html.parser")
+                
+                for link in soup.find_all('th'):
+                    if '실적' in link.text:
+                        table = soup.find('table', class_='s-dr_table dr_table_type2')
+                        if table and table.tbody:
+                            for row in table.tbody.find_all('tr'):
+                                columns = row.find_all('td')
+                                if columns:
+                                    year = columns[0].text.strip()
+                                    sales = columns[1].text.strip()
+                                    sales_data.append({
+                                        'code': code,
+                                        'year': year,
+                                        'sales': sales
+                                    })
+            
+            time.sleep(CONFIG['REQUEST_DELAY'])  # Be nice to the server
+            
+        except Exception as e:
+            logger.error(f"Error scraping data for product code {code}: {str(e)}")
+            continue
+    
+    return pd.DataFrame(sales_data)
 
-# 데이터 Export
-df.to_csv('producedSales.csv', mode="w")
+def process_sales_data(df: pd.DataFrame) -> pd.DataFrame:
+    """Process and clean the sales data."""
+    # Clean sales data
+    df['sales'] = df['sales'].apply(lambda x: re.sub(r'[^0-9]', "", str(x)))
+    df['sales'] = df['sales'].astype(int)
+    
+    # Process year data
+    df['year'] = df['year'].apply(lambda x: re.sub(r'[^0-9]', "", str(x)))
+    df['year'] = pd.to_datetime(df['year'], format='%Y').dt.year
+    
+    return df
+
+def main():
+    try:
+        # Load initial data
+        logger.info("Loading disinfectant data...")
+        disin_df = load_disinfectant_data()
+        product_codes = disin_df['품목기준코드'].tolist()
+        
+        # Scrape sales data
+        logger.info("Scraping sales data...")
+        sales_df = scrape_sales_data(product_codes)
+        
+        # Process the data
+        logger.info("Processing sales data...")
+        sales_df = process_sales_data(sales_df)
+        
+        # Merge with original data
+        logger.info("Merging data...")
+        disin_df = disin_df[CONFIG['DIS_COLS']]
+        final_df = pd.merge(sales_df, disin_df, 
+                          how='left', 
+                          left_on='code', 
+                          right_on='품목기준코드')
+        
+        # Save results
+        logger.info(f"Saving results to {CONFIG['OUTPUT_FILE']}...")
+        final_df.to_csv(CONFIG['OUTPUT_FILE'], index=False)
+        logger.info("Process completed successfully!")
+        
+    except Exception as e:
+        logger.error(f"An error occurred: {str(e)}")
+        raise
+
+if __name__ == "__main__":
+    main()
