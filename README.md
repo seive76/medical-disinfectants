@@ -67,10 +67,6 @@ Key datasets include:
 
 ## Project Structure
 
-# Public data usage guideline
-IROS_398_의약품_제품_허가정보_v1.4
-https://docs.google.com/document/d/1H2eLOlKPOUM_oBIWKTP5qO81QzrJZr4H/edit?usp=sharing&ouid=114096873499970035150&rtpof=true&sd=true
-
 ## Public Data Usage Guidelines
 
 For detailed information about the medical product authorization data format, refer to:
@@ -108,4 +104,3 @@ Please ensure you have the necessary API keys configured in the appropriate conf
 ## License
 
 See the [LICENSE](LICENSE) file for details.
-
